@@ -1,3 +1,7 @@
+#include <stdio.h>
+
 #pragma once
 
-void logMessage(const char* message);
+void logMessageToStdOut(const char* message);
+
+void logMessageToFile(const char* message);
