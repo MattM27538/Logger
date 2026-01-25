@@ -5,3 +5,5 @@
 void logMessageToStdOut(const char* message);
 
 void logMessageToFile(const char* message);
+
+FILE* logFileInit();
