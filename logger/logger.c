@@ -9,28 +9,44 @@
 #define debug 1
 
 typedef void(*logDestination)(const char*);
-static logDestination logDestinationFunctionPointer = logMessageToStdOut; 
+static logDestination logDestinationFunctionPointer = logMessageToStdOut;
 
-void logMessageToStdOut(const char* message){
-    //TODO: extract to function and add to logmessagetofile.
+void logMessage(const char* message){
     #if debug == 1
-        assert(message && "Log message is NULL.");
-        assert((strlen(message) > 0) && "Log message is empty.");
+        assertLogMessage(message);
     #endif
 
-    time_t currentTime = time(NULL);
-    printf("%s: %s", ctime(&currentTime), message);
+    logDestinationFunctionPointer(message);
 }
 
+void assertLogMessage(const char* message){
+    assert(message && "Log message is NULL.");
+    assert((strlen(message) > 0) && "Log message is empty.");
+}
+
+void logMessageToStdOut(const char* message){
+    time_t currentTime = time(NULL);
+    printf("%s: %s", ctime(&currentTime), message);
+}    
+    
 void logMessageToFile(const char* message){
     static FILE* filePointer = NULL;
-
     if(filePointer == NULL){
         filePointer = logFileInit();
     }
 
-    //TODO switch to fprintf
-    fwrite(message, sizeof(char), strlen(message), filePointer);
+    if(filePointer == NULL){
+        time_t currentTime = time(NULL);
+        fprintf(stderr, "%s: Error opening file from source: %s, function: %s\n", ctime(&currentTime), __FILE__, __func__);
+    }
+}
+
+void setLogDestinationToStdout(){
+    logDestinationFunctionPointer = logMessageToStdOut;
+}
+
+void setLogDestinationToFile(){
+    logDestinationFunctionPointer = logMessageToFile;
 }
 
 FILE* logFileInit(){
@@ -38,11 +54,6 @@ FILE* logFileInit(){
 
     //TODO: Allow for user to choose name
     filePointer = fopen("log.txt", "w");
-
-    if(filePointer == NULL){
-        time_t currentTime = time(NULL);
-        fprintf(stderr, "%s: Error opening file from source: %s, function: %s\n", ctime(&currentTime), __FILE__, __func__);
-    }
     
     return filePointer;
 }
