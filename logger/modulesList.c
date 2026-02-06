@@ -33,3 +33,22 @@ bool moduleIsEnabled(const char* moduleName, const ModulesList* listOfModules){
     return false;
 }
 
+bool enableModule(const char* moduleName, ModulesList* modulesList){
+    assert(listOfModules && "listOfModules is not initialized");
+    assert(moduleName && "moduleName is NULL");
+    assert((moduleName != "") && "moduleName is empty");
+    
+    for(int i = 0; i < modulesList->listOfModulesLength; ++i){
+        if(modulesList->listOfModules[i] == moduleName){
+            fprintf(stderr, "Error: Module already enabled.");
+            return false;
+        }
+        else if(modulesList->listOfModules[i] == NULL){
+            modulesList->listOfModules[i] = moduleName;
+            return true;
+        }
+    }
+
+    fprintf(stderr, "Error: modulesList is full.");
+    return false;
+}
